@@ -4,10 +4,9 @@ version: '3'
 # Define services
 services:
   # App backend service
-  app-server:
-    #container_name: spring
-    # Configuration for building the docker image for the backend service
+  app-service:
     image: app-service
+    # container_name: spring-boot-example-metric
     build:
       context: spring-boot-server # Use an image built from the specified dockerfile in the `spring-boot-oauth2-social-login` directory.
       dockerfile: Dockerfile
@@ -33,11 +32,53 @@ services:
       - backend
       - frontend
       - app-network
+      - monitoring-network
+  prometheus:
+    image: prom/prometheus
+    networks:
+    - monitoring-network
+    volumes:
+    - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+    - "9090:9090"
 
- 
+  grafana:
+    image: grafana/grafana
+    networks:
+    - monitoring-network
+    ports:
+    - "3000:3000"
+    volumes:
+    - ./grafana/provisioning:/etc/grafana/provisioning
+    - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+    - prometheus
+
+  node-exporter:
+    image: "prom/node-exporter"
+    networks:
+    - monitoring-network
+    ports:
+    - "9100:9100"
+    depends_on:
+    - prometheus
+
+  # cadvisor:
+  #   image: gcr.io/cadvisor/cadvisor:latest
+  #   container_name: cadvisor
+  #   ports:
+  #     - 8082:8080
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /var/run:/var/run:rw
+  #     - /sys:/sys:ro
+  #     - /var/lib/docker/:/var/lib/docker:ro
+  #   depends_on:
+  #     - app-client
+
+
   # Frontend Service 
   app-client:
-    #container_name: spring
     build:
       context: angular-11-client # Use an image built from the specified dockerfile in the `angular-11-social-login` directory.
       dockerfile: Dockerfile
@@ -47,15 +88,14 @@ services:
       - "8081:80" # Map the exposed port 80 on the container to port 8081 on the host machine
     restart: always
     depends_on:
-      - app-server
+      - app-service
       - fluentd
     logging:
       driver: 'fluentd'
       options:
         fluentd-address: localhost:24224
         tag: app
-    networks:
-      - frontend  
+
  
   # Database Service (Mysql)
   db:
@@ -73,6 +113,17 @@ services:
       - dockerAngularSpringDatabaseData:/var/lib/mysql
     networks:
       - backend  
+      - monitoring-network
+  mysql-exporter:
+    image: "prom/mysqld-exporter"
+    networks:
+      - monitoring-network
+    ports:
+      - "9104:9104"
+    environment:
+      - DATA_SOURCE_NAME=root:pfe@(mysql:3306)/testdb
+    depends_on:
+      - db
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
@@ -128,6 +179,9 @@ networks:
     driver: bridge
   elasticsearch:
     driver: bridge
+  monitoring-network:
+    driver: bridge
+
       
 volumes:
   dockerAngularSpringDatabaseData:

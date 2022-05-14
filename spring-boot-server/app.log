@@ -1,4 +1,4 @@
-2022-04-13 21:54:56.103  INFO 20961 --- [main] .b.s.d.SpringBootDataJpaApplicationTests : Starting SpringBootDataJpaApplicationTests on farah-Inspiron-3580 with PID 20961 (started by farah in /home/farah/Desktop/Focus/spring-boot-angular-11-mysql-master/spring-boot-server)
+2022-04-13 21:54:56.103  INFO 20961 --- [main] .b.s.d.SpringBootDataJpaApplicationTests : Starting SpringBootDataJpaApplicationTests on farah-Inspiron-3580 with PID 20961 (started by farah in /home/farah/Desktop/Focus/DevopsProj/spring-boot-server)
 2022-04-13 21:54:56.131  INFO 20961 --- [main] .b.s.d.SpringBootDataJpaApplicationTests : No active profile set, falling back to default profiles: default
 2022-04-13 21:54:58.066  INFO 20961 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
 2022-04-13 21:54:58.149  INFO 20961 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 68ms. Found 1 repository interfaces.
